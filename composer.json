@@ -1,0 +1,14 @@
+{
+    "name": "modules/%module_slug%",
+    "description": "%module_description%",
+    "authors": [
+        {
+            "name": "%module_author%"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "%module_namespace_json%\\": "app/"
+        }
+    }
+}

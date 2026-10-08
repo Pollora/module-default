@@ -1,0 +1,9 @@
+{
+    "name": "%module_name%",
+    "alias": "%module_slug%",
+    "description": "%module_description%",
+    "keywords": [],
+    "priority": 0,
+    "providers": [],
+    "files": []
+}

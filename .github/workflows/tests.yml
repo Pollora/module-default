@@ -1,0 +1,56 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Nightly: @pollora/vite-config and the framework move without a commit here
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scaffold:
+    name: Scaffold and build
+    runs-on: ubuntu-latest
+
+    # The scaffolder never copies .github, but a fork may
+    if: github.repository == 'Pollora/module-default'
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+
+      - name: Scaffold Modules/BlocksDemo in a project layout
+        run: php bin/scaffold.php "$RUNNER_TEMP/project/Modules/BlocksDemo" BlocksDemo
+
+      - name: Contract
+        run: php bin/check.php "$RUNNER_TEMP/project/Modules/BlocksDemo"
+
+      - name: Build
+        working-directory: ${{ runner.temp }}/project/Modules/BlocksDemo
+        run: |
+          mkdir -p resources/views/blocks/hero
+          echo "export default {};" > resources/views/blocks/hero/index.jsx
+          echo ".hero { color: red; }" > resources/views/blocks/hero/style.css
+          npm install --no-audit --no-fund
+          npm run build
+
+      - name: Built where Pollora serves module.blocks-demo
+        run: |
+          manifest="$RUNNER_TEMP/project/public/build/module/blocks-demo/manifest.json"
+          test -f "$manifest"
+          for entry in resources/assets/app.js resources/views/blocks/hero/index.jsx resources/views/blocks/hero/style.css; do
+            jq -e --arg entry "$entry" '.[$entry].isEntry' "$manifest"
+          done

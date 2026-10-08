@@ -1,0 +1,34 @@
+<?php
+
+declare(strict_types=1);
+
+namespace %module_namespace%\Cms\Hooks;
+
+use Pollora\Attributes\Action;
+use Pollora\Support\Facades\Asset;
+
+/**
+ * WordPress hooks of the %module_name% module.
+ *
+ * Pollora discovers the attributes of every class in app/: no service provider
+ * registers this one. Post types, taxonomies, REST routes and scheduled tasks
+ * declared with attributes are discovered the same way.
+ */
+class %module_name%Hooks
+{
+    /**
+     * Load the module's script and styles on the front end.
+     *
+     * Vite builds them into public/build/module/%module_slug%, served through the
+     * module.%module_slug% asset container. Remove this method if the module has
+     * no front-end assets.
+     */
+    #[Action('init')]
+    public function registerAssets(): void
+    {
+        Asset::add('%module_slug%/app', 'app.js')
+            ->container('module.%module_slug%')
+            ->toFrontend()
+            ->useVite();
+    }
+}
