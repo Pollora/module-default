@@ -1,0 +1,2 @@
+# The template's own CI stays out of the archive that the make commands download
+/.github export-ignore
